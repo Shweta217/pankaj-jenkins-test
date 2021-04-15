@@ -1,0 +1,42 @@
+---
+# tasks file for prachi
+
+    - block:
+        - name: Checking status of WA Agent
+          service:
+            name: workload automation system agent
+          register: wa_agent
+        - name: Showing report of Wa agent
+          debug:
+            var: wa_agent | to_nice_json
+        - name: Wa agent is present
+          set_fact:
+            wa_agent="VALIDATED"
+          when:  wa_agent is succeeded
+      rescue:
+        - name: Wa_agent is not present
+          set_fact:
+            wa_agent="NOT VALIDATED"
+          when: wa_agent is failed
+    - block:
+        - name: Checking status of splunk
+          service:
+            name: splunk
+          register: splunk_agent
+        - name: Showing report of Splunk agent
+          debug:
+            var: splunk_agent | to_json
+        - name: Splunk agent is present
+          when:  splunk_agent is succeeded
+          set_fact:
+            splunk_agent="VALIDATED"
+      rescue:
+       - name: Splunk_agent is not present
+         when: splunk_agent is failed
+         set_fact:
+           wa_agent="NOT VALIDATED"
+
+    - name: template
+      template:
+        src: templates/Check.j2
+        dest: /tmp/Check2.json

@@ -1,7 +1,0 @@
----
-- name: play
-  hosts: windows
-  gather_facts: no
-  #vars_files: vars.yml
-  roles:
-    - roles/sample-role
